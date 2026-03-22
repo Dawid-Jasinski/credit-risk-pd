@@ -1,160 +1,96 @@
 # Credit Risk Modelling – Probability of Default (PD)
 
-This repository contains a complete end‑to‑end project focused on developing a Probability of Default (PD) model using real‑world consumer credit data.  
-The project follows a standard model development workflow used in banking: **exploratory analysis, data quality assessment, preprocessing, model estimation, evaluation, and interpretation**.
-
-The work replicates procedures applied in credit risk departments, with emphasis on transparency, interpretability, and analytical rigor.
-
+Author: Dawid Jasiński 
 ---
-
-## 📘 Project Structure
-credit-risk-pd/
-│
-├── data/
-│   └── cs-training.csv
-│
-└── notebooks/
-├── 01_eda.ipynb        # Exploratory Data Analysis
-└── 02_model.ipynb      # Logistic Regression & Random Forest models
-
+Technologies: Python, pandas, numpy, scikit-learn
 ---
+Source: kaggle.com
+---
+## 🧠 Project Overview
+
+This project focuses on predicting the probability of default using machine learning models. The analysis compares a Logistic Regression model with a Random Forest classifier to evaluate differences in predictive performance and practical usefulness in a credit risk context.
+
+## 📁 Repository Structure
+```
+/notebooks
+   credit-risk-pd.ipynb
+/data
+   cs-training.csv
+/report
+   report_credit-risk-pd.html
+   report_credit-risk-pd.pdf
+```
 
 ## 🎯 Objective
 
-The goal of this project is to estimate PD (Probability of Default) in a 24‑month horizon based on:
+The main goal is to identify borrowers who are likely to default and evaluate models not only statistically, but also from a business perspective, where different types of errors have different costs.
 
-- demographic information,
-- income and indebtedness metrics,
-- credit utilization,
-- historical payment performance.
+## 📂 Dataset
 
-A binary target variable (`SeriousDlqin2yrs`) identifies whether a customer experienced **90+ days past due** within the next two years.
+The dataset contains borrower-level financial and behavioral variables such as:
 
----
+Income
+Credit utilization
+Debt-related metrics
+Delinquency history (late payments)
 
-## 📊 Data Summary
+Target variable:
 
-- **150 000 observations**
-- **11 predictor variables**
-- Mix of demographic, behavioral, and financial attributes
-- Target variable:  
-  `1` – default in next 24 months  
-  `0` – no default  
+default (1 = default, 0 = non-default)
 
-Key data challenges addressed in preprocessing:
+The dataset is imbalanced, with approximately 6–7% defaults.
 
-- Missing values in income (~29.7k)
-- Missing dependents (~3.9k)
-- System-generated erroneous values (`98`) in delinquency variables
-- Outliers in debt ratio and utilization measures
+## ⚙️ Models
+Logistic Regression
+Used as a baseline model
+Interpretable and widely applied in credit risk
+Random Forest
+Ensemble model capturing non-linear relationships
+Used to improve predictive performance
+## 📏 Evaluation Metrics
 
----
+To properly evaluate model performance on imbalanced data, the following metrics were used:
 
-## 🛠️ Preprocessing
+AUC (Area Under ROC Curve)
+Gini coefficient (calculated as: Gini = 2 × AUC − 1)
+Confusion Matrix
+## 📊 Results
 
-Performed according to credit risk modelling standards:
+Logistic Regression
+- AUC: ~0.81
+- Gini: ~0.62
 
-- Median imputation for `MonthlyIncome`
-- Zero-imputation for `NumberOfDependents`
-- Clipping `NumberOfTime…PastDue` variables to max value of 10  
-  (to replace system code `98`)
-- Removal of technical index column
-- Consistent handling of outliers
+Random Forest
+- AUC: ~0.864
+- Gini: ~0.727
 
-All transformations are documented in `01_eda.ipynb`.
+The Random Forest model outperforms Logistic Regression in terms of predictive accuracy.
 
----
+## 🔍 Confusion Matrix Analysis
 
-## 📈 Models
+A key part of the analysis focuses on the business implications of classification errors:
 
-Two models were estimated:
+False Negatives (FN): actual defaulters predicted as non-defaulters
+False Positives (FP): non-defaulters predicted as defaulters
 
-### **1. Logistic Regression (baseline model)**
-- Transparent and fully interpretable
-- Industry-standard for PD modelling
+The Random Forest model significantly reduces the number of False Negatives compared to Logistic Regression, meaning it is more effective at identifying risky clients.
 
-**Performance:**
-- **AUC:** 0.8145  
-- **Gini:** 0.6289  
+From a business perspective:
 
-Key predictors (positive impact on PD):
-- `NumberOfTimes90DaysLate`
-- `NumberOfTime30-59DaysPastDueNotWorse`
-- `NumberOfTime60-89DaysPastDueNotWorse`
+Missing a defaulter (FN) is more costly than rejecting a good client (FP)
+Therefore, reducing FN is a priority
+## 🔍 Feature Importance
 
-Negative impact:
-- `age`
-- `NumberOfOpenCreditLinesAndLoans`  
-- Financial variables show smaller influence.
+The most important predictors in the Random Forest model include:
 
----
+Delinquency-related variables (late payments)
+Credit utilization
 
-### **2. Random Forest (alternative model)**
+These variables have the strongest influence on default prediction.
 
-Used to assess potential improvement from non-linear modelling.
+## 📌 Key Takeaways
+Random Forest provides better predictive performance than Logistic Regression
+AUC and Gini are appropriate metrics for imbalanced classification problems
+Model evaluation should consider business costs, not only statistical accuracy
+Reducing False Negatives is critical in credit risk modeling
 
-**Performance:**
-- **AUC:** 0.8638  
-- **Gini:** 0.7276  
-
-Most important features:
-- `RevolvingUtilizationOfUnsecuredLines`
-- payment delinquency variables (90/60/30 days)
-- `age` as a secondary predictor
-
-Random Forest outperforms Logistic Regression but is less interpretable — a typical trade-off in credit risk.
-
----
-
-## 📉 Evaluation
-
-The models were assessed using:
-
-- **ROC–AUC**
-- **Gini coefficient**
-- Classification matrix
-- Coefficient analysis (LogReg)
-- Feature importance (RF)
-
-Notebooks contain visualizations:
-- ROC curves
-- Feature importance barplots
-
----
-
-## 🏦 Key Business Insights
-
-- Payment history is the strongest determinant of default risk.  
-- High utilization of unsecured credit lines strongly correlates with elevated PD.  
-- Older customers and those with established credit histories tend to show lower PD.  
-- Non-linear models capture additional risk patterns not revealed by linear models.
-
----
-
-## 📝 Technologies Used
-
-- Python (Pandas, NumPy, Scikit-Learn, Matplotlib)
-- Jupyter/VS Code
-- GitHub
-
----
-
-## 📄 Author
-
-Project completed as part of a credit risk modelling portfolio by  
-**Dawid Jasiński**  
-Junior Data Analyst – econometrics & data analytics student
-
----
-
-## 📂 Future Extensions
-
-Possible next steps:
-
-- Scorecard development (weight-of-evidence & binning)
-- PD calibration
-- Reject inference
-- Stability and population drift analysis
-- Model monitoring dashboard (Power BI)
-
----
